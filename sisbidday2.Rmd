@@ -169,5 +169,29 @@ library(tm)
   
 wordcloud(text,max.words=50)
 
+
+#use the ensembl API
+
+
+#The Ensembl ID for the gene P53 is ENSG00000141510. How do you think you'd change the command above to look up this gene?
+
+#switch gene id
+oct4_dat = fromJSON("http://rest.ensembl.org//lookup/id/ENSG00000141510?content-type=application/json;expand=1")
+
+
+
+
+#Based on the Ensembl docs how would you look up the ensembl id for another gene like BRAF?
+
+#look up doc for the base url
+#https://rest.ensembl.org/documentation/
+#go to GET xrefs/symbol/:species/:symbol 
+#look at the example from ensembl
+
+
+braf_dat = fromJSON("http://rest.ensembl.org//lookup/symbol/homo_sapiens/BRAF?content-type=application/json;expand=1")
+
+
+braf_dat$id
 ```
 
