@@ -5,3 +5,27 @@ date: "July 12, 2016"
 output: html_document
 ---
 
+
+
+```{r}
+library(googlesheets)
+
+?gs_read
+#cell specification for input
+
+#checkout R notebook
+
+#PLay with googlesheets using course data
+#Big data wrangling bg survey
+sheets_url = "https://docs.google.com/spreadsheets/d/18KQQd4LY5k8Ucux1MvWCsQGQJlvd0ECTnn-3ixdOKFM/pubhtml"
+gsurl1 = gs_url(sheets_url)
+#to get info on the sheet
+gsurl1
+
+dat = gs_read(gsurl1)
+
+#googlesheets has to be published to the web (not just shared) in order to use this (not done in R, done in the google browser)
+
+
+```
+
