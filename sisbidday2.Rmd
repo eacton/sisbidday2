@@ -24,8 +24,19 @@ gsurl1
 
 dat = gs_read(gsurl1)
 
+subdat <- gs_read(gsurl1, range=cell_cols(1:2))
 #googlesheets has to be published to the web (not just shared) in order to use this (not done in R, done in the google browser)
 
+nrow(dat)
+#69 rows - number of students
+nrow(dat[complete.cases(dat[,-13]),])
+#50 complete cases
 
+#greater than 2 years R experience - logical variable
+logical <- dat$R>2
+
+#create factor
+
+f <- factor(logical, levels=c(TRUE, FALSE),labels=c("Skilled", "Learning"))
 ```
 
