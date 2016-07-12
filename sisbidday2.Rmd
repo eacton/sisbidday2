@@ -24,19 +24,150 @@ gsurl1
 
 dat = gs_read(gsurl1)
 
+#read in first 2 columns only
 subdat <- gs_read(gsurl1, range=cell_cols(1:2))
 #googlesheets has to be published to the web (not just shared) in order to use this (not done in R, done in the google browser)
 
 nrow(dat)
-#69 rows - number of students
+#69 rows - number of students, but some incomplete rows
 nrow(dat[complete.cases(dat[,-13]),])
 #50 complete cases
 
 #greater than 2 years R experience - logical variable
+#probably should have checked to see if actually numeric
 logical <- dat$R>2
 
 #create factor
-
 f <- factor(logical, levels=c(TRUE, FALSE),labels=c("Skilled", "Learning"))
+```
+
+Working with JSON - default way to share data ie. from Facebook API
+
+```{r}
+github_url = "https://api.github.com/users/jtleek/repos"
+
+install.packages("jsonlite")
+library(jsonlite)
+#readin url from Json command
+jsonData <- fromJSON(github_url)
+#info about leek repos on github
+jsonData
+dim(jsonData)
+#name of repos
+jsonData$name
+
+#exploring data frame
+table(sapply(jsonData,class))
+#look at the one data frame
+dim(jsonData$owner)
+#it is a dataframe inside a dataframe
+names(jsonData$owner)
+#to look at this need to double subset
+jsonData$owner$html_url
+
+```
+
+
+Web Scraping
+```{r}
+#view page source shows the underlying html file which can be harvested
+#inspect element (after highlighting) will show a specific section of code
+
+#installed firebug on firefox to get view xpath
+library(rvest)
+recount_url = "http://bowtie-bio.sourceforge.net/recount/"
+#read in the html
+htmlfile = read_html(recount_url)
+#search through for the xpath - the subset corresponding to the table
+
+nds = html_nodes(htmlfile, xpath='//*[@id="recounttab"]/table')
+#convert into table that can be used as dataframe
+dat = html_table(nds)
+dat = as.data.frame(dat)
+head(dat)
+#column headers not recognized
+names(dat) <- dat[1,]
+dat <- dat[-1,]
+head(dat)
+
+
+```
+
+
+APIs
+
+```{r}
+#predeveloped packages
+#Figshare API
+#install.packages("rfigshare")
+library(rfigshare)
+leeksearch = fs_search("Leek")
+#this is behind a password
+length(leeksearch)
+leeksearch[[1]]
+
+#do it yourself
+#check the rate limit - how much data you can get per unit time
+#read the terms and conditions
+#?q is query, searching not cran, using R, created on a certain date
+#github's api
+
+query_url = "https://api.github.com/search/repositories?q=created:2014-08-13+language:r+-user:cran"
+
+library(httr)
+req = GET(query_url)
+content(req)
+
+#pubmed is an open api
+
+#closed apis - ie. twitter - have to create a developer account, fitbit
+#authorize as an app in r that downloads data
+#example
+myapp = oauth_app("twitter",
+                   key="yourConsumerKeyHere",secret="yourConsumerSecretHere")
+sig = sign_oauth1.0(myapp,
+                     token = "yourTokenHere",
+                      token_secret = "yourTokenSecretHere")
+homeTL = GET("https://api.twitter.com/1.1/statuses/home_timeline.json", sig)
+
+
+#api lab
+/html/body/div[1]/div[1]/div[2]/div/div[2]/div/div[3]
+/html/body/div[1]/div[1]/div[2]/div/div[2]/div/div[3]/div[2]/table
+
+bio_url = "http://bioconductor.org/packages/release/BiocViews.html#___Software/"
+#read in the html
+htmlfile = read_html(bio_url)
+#search through for the xpath - the subset corresponding to the table
+
+nds = html_nodes(htmlfile, xpath='//*[@id="biocViews_package_table"]/table')
+nds = html_nodes(htmlfile, xpath="//biocViews_package_table")
+
+
+#will not work b/c site has javascript code that generates the table, not the table, so need to have a piece of code to get the table generated and take the html code
+
+#can use phantom js and leek's code
+#but have the evaluated html
+
+bio_url = "https://raw.githubusercontent.com/SISBID/Module1/gh-pages/labs/bioc-software.html"
+#read in the html
+htmlfile = read_html(bio_url)
+nds = html_nodes(htmlfile, xpath='//*[@id="biocViews_package_table"]')
+#convert into table that can be used as dataframe
+dat = html_table(nds)
+dat = as.data.frame(dat)
+head(dat)
+
+str(dat)
+
+#To make the word cloud:
+text = paste(dat[,3], collapse=" ")
+
+library(wordcloud)
+#install.packages("tm")
+library(tm)
+  
+wordcloud(text,max.words=50)
+
 ```
 
